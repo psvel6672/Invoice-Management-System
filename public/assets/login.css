@@ -1,0 +1,26 @@
+.login-card {
+  animation: fadeUp 0.5s ease;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input focus */
+
+.input-field:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Gradient background */
+
+body {
+  background: linear-gradient(135deg, #2563eb, #1e293b);
+}

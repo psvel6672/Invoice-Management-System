@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Invoice Management System</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+
+    <!-- <link
+      href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
+      rel="stylesheet"
+    /> -->
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.7/css/dataTables.tailwindcss.min.css"
+    />
+
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+
+  <body class="bg-slate-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+      <!-- SIDEBAR -->
+      <div
+        id="sidebar"
+        class="bg-slate-900 text-white w-64 flex flex-col transition-all duration-300 fixed md:relative z-40 h-full -translate-x-full md:translate-x-0"
+      >
+        <!-- Sidebar Header -->
+        <div
+          class="flex items-center justify-between p-5 border-b border-slate-700"
+        >
+          <h1 id="sidebarTitle" class="text-lg font-bold">PS Invoice</h1>
+
+          <button id="closeSidebar" class="md:hidden text-white text-xl">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Menu -->
+        <nav class="flex-1 p-3 space-y-2 sidebar-scroll">
+          <a
+            href="/"
+            class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+          >
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="menu-text">Dashboard</span>
+          </a>
+
+          <a
+            href="/allproducts"
+            class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+          >
+            <i class="fa-solid fa-box"></i>
+            <span class="menu-text">Products</span>
+          </a>
+
+          <a
+            href="/allinvoices"
+            class="menu-item flex items-center gap-3 p-3 rounded-lg bg-blue-600"
+          >
+            <i class="fa-solid fa-file-invoice"></i>
+            <span class="menu-text">Invoices</span>
+          </a>
+
+          <a
+            href="/allcustomers"
+            class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+          >
+            <i class="fa-solid fa-users"></i>
+            <span class="menu-text">Customers</span>
+          </a>
+
+          <a
+            href="/allsysusers"
+            class="menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800"
+          >
+            <i class="fa-solid fa-user-shield"></i>
+            <span class="menu-text">System Users</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- MAIN AREA -->
+      <div class="flex-1 flex flex-col">
+        <!-- NAVBAR -->
+        <header
+          class="bg-white shadow-sm px-6 py-4 flex justify-between items-center"
+        >
+          <div class="flex items-center gap-4">
+            <button id="menuBtn" class="text-slate-600 text-xl">
+              <i class="fa fa-bars"></i>
+            </button>
+
+            <h2 class="text-xl font-semibold text-slate-700">Invoices</h2>
+          </div>
+
+          <!-- PROFILE DROPDOWN -->
+          <div class="relative">
+            <button id="profileBtn" class="flex items-center gap-3">
+              <div class="text-right">
+                <p class="text-sm font-semibold text-slate-700">Admin</p>
+                <p class="text-xs text-slate-500">Administrator</p>
+              </div>
+
+              <i class="fa-solid fa-circle-user text-3xl text-slate-600"></i>
+            </button>
+
+            <div
+              id="profileDropdown"
+              class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border"
+            >
+              <a
+                href="#"
+                class="flex items-center gap-3 px-4 py-2 text-sm hover:bg-slate-100"
+              >
+                <i class="fa fa-user"></i>
+                Profile
+              </a>
+
+              <a
+                href="#"
+                class="flex items-center gap-3 px-4 py-2 text-sm hover:bg-slate-100"
+              >
+                <i class="fa fa-gear"></i>
+                Settings
+              </a>
+
+              <hr />
+
+              <a onclick="openLogoutModal();"
+                href="#"
+                class="flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-red-50"
+              >
+                <i class="fa fa-right-from-bracket"></i>
+                Logout
+              </a>
+            </div>
+          </div>
+        </header>
+
+        <!-- CONTENT -->
+        <main class="p-6 space-y-3 overflow-y-auto" id="addInvoicePage">
+          <!-- HEADER -->
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-semibold text-slate-800">
+                Create Invoice
+              </h1>
+              <p class="text-sm text-slate-500">
+                Generate a new invoice for your customer
+              </p>
+            </div>
+
+            <div class="flex gap-3">
+              <button
+                class="px-4 py-2 border rounded-lg hover:bg-slate-100 flex items-center gap-2 text-sm"
+              >
+                Cancel
+              </button>
+
+              <button
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm" onclick="openSaveInvoiceModal()"
+              >
+                Save Invoice
+              </button>
+            </div>
+          </div>
+
+          <!-- <div class="bg-white rounded-xl shadow-sm border p-6"> -->
+          <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+            <h2 class="font-semibold text-slate-700">Invoice Details</h2>
+
+            <div class="grid grid-cols-5 gap-4">
+              <div>
+                <label class="text-xs text-slate-500">Invoice Date</label>
+                <input type="date" class="border rounded-lg px-3 py-2 w-full" id="invoice_date" />
+              </div>
+
+              <div>
+                <label class="text-xs text-slate-500">Due Date</label>
+                <input type="date" class="border rounded-lg px-3 py-2 w-full" id="invoice_due_date" />
+              </div>
+
+              <div>
+                <label class="text-xs text-slate-500">Invoice Type</label>
+                <select class="border rounded-lg px-3 py-2 w-full" id="invoice_type">
+                  <option>Invoice</option>
+                  <option>Quote</option>
+                  <option>Receipt</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="text-xs text-slate-500">Payment Status</label>
+                <select class="border rounded-lg px-3 py-2 w-full" id="invoice_pay_status">
+                  <option>Unpaid</option>
+                  <option>Paid</option>
+                  <option>Partial</option>
+                </select>
+              </div>
+              
+              <div>
+                <label class="text-xs text-slate-500">Paid Via</label>
+                <select class="border rounded-lg px-3 py-2 w-full" id="invoice_paid_via">
+                  <option>Unpaid</option>
+                  <option>G-Pay</option>
+                  <option>PhonePe</option>
+                  <option>Cash</option>
+                  <option>Bank Transfer</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- </div> -->
+
+          <!-- CUSTOMER + INVOICE INFO -->
+          <div class="grid lg:grid-cols-2 gap-6">
+            <!-- CUSTOMER CARD -->
+            <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+              <h2 class="font-semibold text-slate-700">Customer Information</h2>
+
+              <div class="searchSelect">
+                <div class="selectDisplay" onclick="toggleDropdown(this)">
+                  Select Customer
+                </div>
+
+                <div class="selectDropdown">
+                  <input
+                    type="text"
+                    class="dropdownSearch"
+                    placeholder="Search customer..."
+                    onkeyup="filterDropdown(this)"
+                  />
+
+                  <ul class="dropdownList" id="invoiceCustomerDD">
+                  </ul>
+                </div>
+
+                <input type="hidden" id="custInfoName" />
+                <input type="hidden" id="custInfoId" />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <input
+                  type="number"
+                  id="custInvoiceMobile"
+                  placeholder="Mobile"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+
+                <input
+                  type="email"
+                  id="custInvoiceEmail"
+                  placeholder="Email"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+
+                <input
+                  type="text"
+                  id="custInvoiceAddress"
+                  placeholder="Address"
+                  class="border rounded-lg px-3 py-2 w-full col-span-2"
+                />
+
+                <input
+                  type="text"
+                  id="custInvoiceCity"
+                  placeholder="City"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+                <input
+                  type="text"
+                  id="custInvoiceState"
+                  placeholder="State"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+                <input
+                  type="number"
+                  id="custInvoicePin"
+                  placeholder="Pincode"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+              </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+              <div class="flex justify-between items-center">
+                <h2 class="font-semibold text-slate-700">
+                  Shipping Information
+                </h2>
+                <div class="flex justify-between items-center">
+                  <label for="" class="text-sm">Same as Customer Info</label>
+                  <input type="checkbox" class="ml-2" id="invoiceCustInfoCheckbox" />
+                </div>
+              </div>
+
+              <div class="">
+                <input
+                  type="text"
+                  id="custInvoiceShippingName"
+                  placeholder="Shipping Customer Name"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+              </div>
+
+              <div class="grid grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  id="custInvoiceShippingMobile"
+                  placeholder="Mobile"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+
+                <input
+                  type="email"
+                  id="custInvoiceShippingEmail"
+                  placeholder="Email"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+
+                <input
+                  type="text"
+                  id="custInvoiceShippingAddress"
+                  placeholder="Address"
+                  class="border rounded-lg px-3 py-2 w-full col-span-2"
+                />
+
+                <input
+                  type="text"
+                  id="custInvoiceShippingCity"
+                  placeholder="City"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+                <input
+                  type="text"
+                  id="custInvoiceShippingState"
+                  placeholder="State"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+                <input
+                  type="number"
+                  id="custInvoiceShippingPin"
+                  placeholder="Pincode"
+                  class="border rounded-lg px-3 py-2 w-full"
+                />
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SHIPPING -->
+
+          <!-- PRODUCT TABLE -->
+          <div class="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+            <div class="flex justify-between items-center">
+              <h2 class="font-semibold text-slate-700">Invoice Items</h2>
+
+              <button
+                onclick="addInvoiceProductRow()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm"
+              >
+                <i class="fa fa-plus mr-1"></i> Add Product
+              </button>
+            </div>
+
+            <div class="">
+              <table class="w-full text-sm min-w-[700px]">
+                <thead class="border-b text-slate-500">
+                  <tr>
+                    <th class="text-left px-4 py-3  w-[150px]">Product</th>
+                    <th class="text-left px-4 py-3">Description</th>
+                    <th class="text-left px-4 py-3 w-[100px]">Quantity</th>
+                    <th class="text-left px-4 py-3 w-[100px]">Price</th>
+                    <th class="text-left px-4 py-3 w-[100px]">Discount(%)</th>
+                    <th class="text-left px-4 py-3 w-[100px]">Tax(%)</th>
+                    <th class="text-left px-4 py-3 w-[100px]">Subtotal</th>
+                    <th class="text-left px-4 py-3 w-[50px]">Action</th>
+                  </tr>
+                </thead>
+
+                <tbody id="invoiceItems" class="divide-y">
+                  <tr>
+                    <td class="px-4 py-3">
+                      <div class="searchSelect">
+                        <div
+                          class="selectDisplay"
+                          onclick="toggleDropdown(this)"
+                        >
+                          Select Product
+                        </div>
+
+                        <div class="selectDropdown">
+                          <input
+                            type="text"
+                            class="dropdownSearch"
+                            placeholder="Search customer..."
+                            onkeyup="filterDropdown(this)"
+                          />
+
+                          <ul class="dropdownList" id="invoiceProductsDD">
+                          </ul>
+                        </div>
+
+                        <input type="hidden" name="customer" class="invoiceProductName" />
+                        <input type="hidden" name="customer" class="invoiceProductId" />
+                      </div>
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <input
+                        type="text"
+                        name="description[]"
+                        placeholder="Description"
+                        class="invoiceProductDesc w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        name="quantity[]"
+                        placeholder="Quantity"
+                        class="invoiceProductQuantity w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        name="price[]"
+                        placeholder="Price"
+                        class="invoiceProductPrice w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </td>
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        name="discount[]"
+                        placeholder="Discount"
+                        class="invoiceProductDiscount w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </td>
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        name="tax[]"
+                        placeholder="Tax"
+                        class="invoiceProductTax w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </td>
+                    <td class="px-4 py-3">
+                      <input
+                        type="number"
+                        name="subtotal[]"
+                        placeholder="Sub Total"
+                        class="invoiceProductSubTotal w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </td>
+
+                    <td class="px-4 py-3">
+                      <button
+                        type="button"
+                        class="removeInvoiceProductRow text-red-500 hover:text-red-700"
+                      >
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TOTALS + REMARKS -->
+          <div class="grid lg:grid-cols-2 gap-6">
+            <!-- REMARKS -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+              <h2 class="font-semibold text-slate-700 mb-3">Remarks</h2>
+
+              <textarea
+                rows="4"
+                id="invoiceRemarks"
+                placeholder="Additional notes..."
+                class="w-full border rounded-lg px-3 py-2"
+              ></textarea>
+
+              <h2 class="font-semibold text-slate-700 my-3">Email (if you wish to override the default invoice type email message!)</h2>
+              <input type="text" class="w-full border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" id="invoiceCustomEmail" placeholder="Custom Email">
+              
+            </div>
+
+            <!-- TOTAL PANEL -->
+            <div class="bg-white rounded-xl shadow-sm border p-6">
+              <h2 class="font-semibold text-slate-700 mb-4">Invoice Summary</h2>
+
+              <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                  <span>Subtotal</span>
+                  <span id="subtotal">0</span>
+                </div>
+
+                <div class="flex justify-between">
+                  <span>Discount</span>
+                  <span id="discount">0</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Shipping</span>
+                  <input type="number" name="" id="invoiceShippingCharges" class="min-w-[100px] border border-slate-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Shipping Charges">
+                </div>
+
+                <div class="flex justify-between">
+                  <span>Tax</span>
+                  <span id="invoiceTax">0</span>
+                </div>
+                
+                <div class="flex">
+                  <span>Remove Tax</span>
+                  <input type="checkbox" class="ml-2" id="removeTaxInvoice">
+                </div>
+
+                <div
+                  class="border-t pt-3 flex justify-between font-semibold text-lg"
+                >
+                  <span>Total</span>
+                  <span id="grandTotal">0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <div
+      id="confirmSaveInvoiceModal"
+      class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center hidden z-50"
+    >
+      <div class="bg-white rounded-2xl shadow-lg w-[90%] max-w-md p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <i class="fa fa-file-invoice text-green-500 text-2xl"></i>
+
+          <h3 class="text-lg font-semibold text-slate-700">Confirm Save Invoice</h3>
+        </div>
+
+        <p class="text-sm text-slate-500 mb-6">
+          Are you sure you want to save this invoice now?
+        </p>
+
+        <div class="flex justify-end gap-3">
+          <button
+            id="cancelInvoiceModal"
+            class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-sm"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="confirmSaveInvoice"
+            class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm"
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script> -->
+
+    <script src="/assets/script.js"></script>
+  </body>
+</html>
